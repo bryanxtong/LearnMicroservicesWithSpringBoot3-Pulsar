@@ -1,0 +1,73 @@
+server:
+  port: 8000
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    loadbalancer:
+      ribbon:
+        # Not needed since we excluded the dependency
+        enabled: false
+    consul:
+      enabled: true
+      discovery:
+        # Get only services that are passing the health check
+        query-passing: true
+    gateway:
+      routes:
+        - id: multiplication
+          uri: lb://multiplication/
+          predicates:
+            - Path=/challenges/**,/attempts/**,/users/**
+        - id: gamification
+          uri: lb://gamification/
+          predicates:
+            - Path=/leaders
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:3000"
+            allowedHeaders:
+              - "*"
+            allowedMethods:
+              - "GET"
+              - "POST"
+              - "OPTIONS"
+      default-filters:
+        - name: Retry
+          args:
+            retries: 3
+            methods: GET,POST
+      observability:
+        enabled: true
+      #httpserver:
+        #wiretap: true
+      #httpclient:
+        #wiretap: true
+  reactor:
+    context-propagation: auto
+##working with default logback configuration for distributed tracing
+logging:
+  pattern:
+    level: "[${spring.application.name:-},%X{traceId:-},%X{spanId:-}] "
+  include-application-name: false
+  level:
+    reactor.netty: DEBUG
+    org.springframework.cloud.gateway.handler.predicate: trace
+    #io.micrometer: TRACE
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    enabled: true
+  #endpoint:
+    #gateway:
+      #enabled: true
+  #endpoints:
+    #web:
+      #exposure:
+        #include: health, gateway
+    #propagation:
+      #type: w3c
