@@ -25,7 +25,7 @@ class ChallengeEventPubTest {
 
     @BeforeEach
     public void setUp() {
-        challengeEventPub = new ChallengeEventPub(pulsarTemplate);
+        challengeEventPub = new ChallengeEventPub(pulsarTemplate,"attempts.topic");
     }
 
     @ParameterizedTest
