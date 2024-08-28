@@ -17,7 +17,10 @@ public class ChallengeEventPub {
 
     public void challengeSolved(final ChallengeAttempt challengeAttempt) {
         ChallengeSolvedEvent event = buildEvent(challengeAttempt);
-        pulsarTemplate.send(topic,event);
+        pulsarTemplate.newMessage(event)
+                .withTopic(topic)
+                .withMessageCustomizer((mb)-> mb.key(String.valueOf(event.getAttemptId())))
+                .send();
     }
 
     private ChallengeSolvedEvent buildEvent(final ChallengeAttempt attempt) {
