@@ -25,7 +25,7 @@ public class PulsarAppenderWithHeader<E> extends PulsarAppender<ILoggingEvent> {
         }
         //add producer properties
 
-        final ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(key, payload,messageProperties);
+        final ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(key, payload, messageProperties);
         //both common logs and pulsar client logs append may lead to dead lock, disable pulsar client logs as a temp solution [logging.level.org.apache.pulsar.client.impl=ERROR]
         final Producer<byte[]> producer = lazyProducer.get();
 

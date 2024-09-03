@@ -155,7 +155,6 @@ public class PulsarAppender<E> extends PulsarAppenderConfig<E> {
      * @throws PulsarClientException
      */
     protected Producer<byte[]> createProducer() throws PulsarClientException, ExecutionException, InterruptedException, TimeoutException {
-        System.out.println("Properties config====>" + messageProperties);
         if(null == pulsarClient){
             pulsarClient = PulsarClient.builder()
                     .serviceUrl(brokerUrl)
