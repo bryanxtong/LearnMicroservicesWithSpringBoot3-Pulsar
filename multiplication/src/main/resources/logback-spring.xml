@@ -2,12 +2,37 @@
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
-    <!--    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <!--<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
                 <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
             </encoder>
         </appender>-->
+
+    <!--[host-port-applicationId] as pulsar key and host is determined with application code-->
+    <springProperty scope="context" name="applicationId" source="spring.application.name" defaultValue="multiplication"/>
+    <springProperty scope="context" name="port" source="server.port" defaultValue="8080"/>
+
+    <!-- This is the kafkaAppender -->
+    <appender name="pulsarAppender" class="logback.pulsar.PulsarAppenderWithHeader">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <topic>logs</topic>
+        <!--<keyingStrategy class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy" />-->
+        <keyingStrategy class="logback.pulsar.PulsarAggregateLogsKeyingStrategy" />
+        <deliveryStrategy class="com.github.bryan.logback.pulsar.delivery.AsynchronousDeliveryStrategy" />
+
+        <!-- Optional parameter to use a fixed partition -->
+        <!-- <partition>0</partition> -->
+
+        <!-- brokerUrl is the only mandatory -->
+        <brokerUrl>pulsar://localhost:6650</brokerUrl>
+        <!-- this is the fallback appender if pulsar is not available. -->
+        <appender-ref ref="CONSOLE" />
+    </appender>
+
     <root level="INFO">
-        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="pulsarAppender" />
     </root>
 </configuration>
