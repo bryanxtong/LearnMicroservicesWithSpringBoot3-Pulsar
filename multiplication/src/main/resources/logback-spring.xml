@@ -13,7 +13,7 @@
     <springProperty scope="context" name="port" source="server.port" defaultValue="8080"/>
 
     <!-- This is the kafkaAppender -->
-    <appender name="pulsarAppender" class="logback.pulsar.PulsarAppenderWithHeader">
+    <appender name="pulsarAppender" class="com.github.bryan.logback.pulsar.PulsarAppender">
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
@@ -23,7 +23,7 @@
         <deliveryStrategy class="com.github.bryan.logback.pulsar.delivery.AsynchronousDeliveryStrategy" />
 
         <!-- Optional parameter to use a fixed partition -->
-        <!-- <partition>0</partition> -->
+        <partition>0</partition>
 
         <!-- brokerUrl is the only mandatory -->
         <brokerUrl>pulsar://localhost:6650</brokerUrl>

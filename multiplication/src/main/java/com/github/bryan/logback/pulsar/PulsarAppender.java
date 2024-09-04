@@ -8,6 +8,7 @@ import org.apache.pulsar.client.api.*;
 import org.apache.pulsar.client.impl.ProducerImpl;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -132,8 +133,20 @@ public class PulsarAppender<E> extends PulsarAppenderConfig<E> {
 
         final Long timestamp = isAppendTimestamp() ? getTimestamp(e) : null;
 
+        //add producer properties
+        if(e instanceof ILoggingEvent){
+            this.getMessageProperties().put("level",((ILoggingEvent)e).getLevel().toString());
+        }
+        Map<String, String> copyOfPropertyMap = encoder.getContext().getCopyOfPropertyMap();
+        if(copyOfPropertyMap != null){
+            copyOfPropertyMap.entrySet().forEach(c-> this.getMessageProperties().put(c.getKey(), c.getValue()));
+        }
+        //add producer properties
+
         final ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(key, payload, messageProperties);
 
+        //both common logs and pulsar client logs append may lead to dead lock when creating the pulsar producer,
+        //disable pulsar client logs as a temp solution [logging.level.org.apache.pulsar.client.impl=ERROR]
         final Producer<byte[]> producer = lazyProducer.get();
         if (producer != null) {
             deliveryStrategy.send(lazyProducer.get(), record, e, failedDeliveryCallback);
