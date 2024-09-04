@@ -25,12 +25,12 @@ public class PulsarAppender<E> extends PulsarAppenderConfig<E> {
     //private static final String KAFKA_LOGGER_PREFIX = KafkaProducer.class.getPackage().getName().replaceFirst("\\.producer$", "");
     private static final String PULSAR_LOGGER_PREFIX = ProducerImpl.class.getPackage().getName().replaceFirst("\\.client.impl$", "");
 
-    public LazyProducer lazyProducer = null;
+    private LazyProducer lazyProducer = null;
 
     private volatile PulsarClient pulsarClient = null;
     private final AppenderAttachableImpl<E> aai = new AppenderAttachableImpl<E>();
     private final ConcurrentLinkedQueue<E> queue = new ConcurrentLinkedQueue<E>();
-    protected final FailedDeliveryCallback<E> failedDeliveryCallback = new FailedDeliveryCallback<E>() {
+    private final FailedDeliveryCallback<E> failedDeliveryCallback = new FailedDeliveryCallback<E>() {
         @Override
         public void onFailedDelivery(E evt, Throwable throwable) {
             aai.appendLoopOnAppenders(evt);
