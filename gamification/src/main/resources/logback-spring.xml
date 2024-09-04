@@ -8,7 +8,31 @@
         </encoder>
     </appender>-->
 
+    <springProperty scope="context" name="applicationId" source="spring.application.name" defaultValue="gamification"/>
+    <springProperty scope="context" name="port" source="server.port" defaultValue="8000"/>
+
+    <!-- This is the pulsarAppender -->
+    <appender name="pulsarAppender" class="com.github.bryan.logback.pulsar.PulsarAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <topic>logs</topic>
+        <keyingStrategy class="logback.pulsar.PulsarAggregateLogsKeyingStrategy" />
+        <deliveryStrategy class="com.github.bryan.logback.pulsar.delivery.AsynchronousDeliveryStrategy" />
+
+        <!-- Optional parameter to use a fixed partition -->
+        <!--
+                <partition>0</partition>
+        -->
+
+        <!-- brokerUrl is the only mandatory -->
+        <brokerUrl>pulsar://localhost:6650</brokerUrl>
+        <!-- this is the fallback appender if pulsar is not available. -->
+        <appender-ref ref="CONSOLE" />
+    </appender>
+
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
+        <appender-ref ref="pulsarAppender" />
     </root>
 </configuration>

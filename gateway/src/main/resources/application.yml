@@ -55,8 +55,12 @@ logging:
   level:
     reactor.netty: DEBUG
     org.springframework.cloud.gateway.handler.predicate: trace
-    #io.micrometer: TRACE
 
+    ##During the process of creating the pulsar lazy producer in appender, there should no logs in the pulsar client code to append logs which would lead to dead lock
+    ##Disable logs for pulsar client as a temp solution
+    org.apache.pulsar.client.impl: ERROR
+
+    #io.micrometer: TRACE
 management:
   tracing:
     sampling:

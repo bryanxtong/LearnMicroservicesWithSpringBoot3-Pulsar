@@ -23,7 +23,9 @@
         <deliveryStrategy class="com.github.bryan.logback.pulsar.delivery.AsynchronousDeliveryStrategy" />
 
         <!-- Optional parameter to use a fixed partition -->
+<!--
         <partition>0</partition>
+-->
 
         <!-- brokerUrl is the only mandatory -->
         <brokerUrl>pulsar://localhost:6650</brokerUrl>
