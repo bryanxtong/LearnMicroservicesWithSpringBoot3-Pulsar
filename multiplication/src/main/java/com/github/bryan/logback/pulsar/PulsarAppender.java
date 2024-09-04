@@ -71,14 +71,17 @@ public class PulsarAppender<E> extends PulsarAppenderConfig<E> {
         super.stop();
         if (lazyProducer != null && lazyProducer.isInitialized()) {
             try {
-                lazyProducer.get().close();
+                Producer<byte[]> producer = lazyProducer.get();
+                if(null != producer && !producer.isConnected()){
+                    producer.close();
+                }
             } catch (PulsarClientException e) {
                 this.addWarn("Failed to shut down pulsar producer: " + e.getMessage(), e);
             }
             lazyProducer = null;
         }
 
-        if(pulsarClient!= null){
+        if(pulsarClient != null && !pulsarClient.isClosed()){
             try {
                 pulsarClient.close();
             } catch (PulsarClientException e) {
@@ -160,18 +163,20 @@ public class PulsarAppender<E> extends PulsarAppenderConfig<E> {
                     .serviceUrl(brokerUrl)
                     .build();
         }
-        Producer<byte[]> producer = pulsarClient
+        ProducerBuilder<byte[]> producerBuilder = pulsarClient
                 .newProducer()
-                .topic(topic)
-                .messageRouter(new MessageRouter() {
-            @Override
-            public int choosePartition(Message<?> msg, TopicMetadata metadata) {
-                if(partition!= null){
+                .topic(topic);
+
+        //if partition is set, use that partition otherwise use default roundrobin
+        if(partition!= null){
+            producerBuilder.messageRouter(new MessageRouter() {
+                @Override
+                public int choosePartition(Message<?> msg, TopicMetadata metadata) {
                     return partition;
                 }
-                return MessageRouter.super.choosePartition(msg, metadata);
-            }
-        }).create();
+            });
+        }
+        Producer<byte[]> producer = producerBuilder.create();
         return producer;
     }
 

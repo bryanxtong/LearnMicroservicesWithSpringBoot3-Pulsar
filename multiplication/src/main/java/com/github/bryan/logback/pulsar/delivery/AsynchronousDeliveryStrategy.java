@@ -30,6 +30,7 @@ public class AsynchronousDeliveryStrategy implements DeliveryStrategy {
             CompletableFuture<MessageId> resultFuture = mb.properties(properties).value(value).sendAsync();
             resultFuture.whenComplete((messageId, exception) -> {
                 if (exception != null) {
+                    exception.printStackTrace();
                     failedDeliveryCallback.onFailedDelivery(event, exception);
                 }
             });
