@@ -11,7 +11,7 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_CLOUD_CONSUL_HOST=consul
     depends_on:
-      - rabbitmq-dev
+      - pulsar
       - consul-importer
     networks:
       - microservices
@@ -21,7 +21,7 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_CLOUD_CONSUL_HOST=consul
     depends_on:
-      - rabbitmq-dev
+      - pulsar
       - consul-importer
     networks:
       - microservices
@@ -33,7 +33,7 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_CLOUD_CONSUL_HOST=consul
     depends_on:
-      - rabbitmq-dev
+      - pulsar
       - consul-importer
     networks:
       - microservices
@@ -43,7 +43,7 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_CLOUD_CONSUL_HOST=consul
     depends_on:
-      - rabbitmq-dev
+      - pulsar
       - consul-importer
     networks:
       - microservices
@@ -62,12 +62,13 @@ services:
     command: 'agent -dev -node=learnmicro -client=0.0.0.0 -log-level=INFO'
     networks:
       - microservices
-  rabbitmq-dev:
-    image: rabbitmq:3.12.10-management
-    container_name: rabbitmq
+  pulsar:
+    image: 'apachepulsar/pulsar:3.3.1'
+    container_name: pulsar
     ports:
-      - '5672:5672'
-      - '15672:15672'
+      - 6650:6650
+      - 8080:8080
+    command: 'bin/pulsar standalone'
     networks:
       - microservices
 networks:
