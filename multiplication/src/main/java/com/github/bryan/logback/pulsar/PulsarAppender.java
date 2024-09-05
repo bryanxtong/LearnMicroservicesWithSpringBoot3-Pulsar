@@ -73,7 +73,7 @@ public class PulsarAppender<E> extends PulsarAppenderConfig<E> {
         if (lazyProducer != null && lazyProducer.isInitialized()) {
             try {
                 Producer<byte[]> producer = lazyProducer.get();
-                if(null != producer && !producer.isConnected()){
+                if(null != producer && producer.isConnected()){
                     producer.close();
                 }
             } catch (PulsarClientException e) {
