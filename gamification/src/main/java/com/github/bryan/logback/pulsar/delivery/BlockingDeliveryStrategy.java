@@ -7,19 +7,15 @@ import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.client.api.TypedMessageBuilder;
 
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * DeliveryStrategy that waits on the producer if the output buffer is full.
- * The wait timeout is configurable with {@link BlockingDeliveryStrategy#setTimeout(long)}
  *
  * @since 0.0.1
  * @deprecated Use {@link AsynchronousDeliveryStrategy} instead.
  */
 @Deprecated
 public class BlockingDeliveryStrategy extends ContextAwareBase implements DeliveryStrategy {
-
-    private long timeout = 0L;
 
     @Override
     public <K, V, E> boolean send(Producer<V> producer, ProducerRecord<K, V> record, E event, FailedDeliveryCallback<E> failureCallback) {
@@ -33,30 +29,11 @@ public class BlockingDeliveryStrategy extends ContextAwareBase implements Delive
                 mb.key((String) key);
             }
             Map<String, String> properties = record.getProperties();
-            mb.properties(properties).send();
+            mb.value(record.getValue()).properties(properties).send();
             return true;
         } catch (PulsarClientException e) {
             failureCallback.onFailedDelivery(event, e);
         }
         return false;
     }
-
-    public long getTimeout() {
-        return timeout;
-    }
-
-    /**
-     * Sets the timeout for waits on full consumers.
-     * <ul>
-     *     <li>{@code timeout > 0}: Wait for {@code timeout} milliseconds</li>
-     *     <li>{@code timeout == 0}: Wait infinitely
-     * </ul>
-     *
-     * @param timeout a timeout in {@link TimeUnit#MILLISECONDS}.
-     */
-    public void setTimeout(long timeout) {
-        this.timeout = timeout;
-    }
-
-
 }
