@@ -71,14 +71,26 @@ public class PulsarAppender<E> extends PulsarAppenderConfig<E> {
     public void stop() {
         super.stop();
 
-        //pulsar client will close the producer
-        if (lazyProducer != null && lazyProducer.isInitialized()) {
-            if(pulsarClient!= null){
-                pulsarClient.closeAsync();
+        //pulsar client library will close the producer
+        /*if (lazyProducer != null && lazyProducer.isInitialized()) {
+            try {
+                Producer<byte[]> producer = lazyProducer.get();
+                if(null != producer && producer.isConnected()){
+                    producer.close();
+                }
+            } catch (PulsarClientException e) {
+                this.addWarn("Failed to shut down pulsar producer: " + e.getMessage(), e);
             }
-            pulsarClient = null;
             lazyProducer = null;
         }
+
+        if(pulsarClient != null && !pulsarClient.isClosed()){
+            try {
+                pulsarClient.close();
+            } catch (PulsarClientException e) {
+                this.addWarn("Failed to shut down pulsar client: " + e.getMessage(), e);
+            }
+        }*/
     }
 
     @Override
