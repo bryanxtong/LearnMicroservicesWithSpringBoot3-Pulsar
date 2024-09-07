@@ -7,7 +7,10 @@ spring:
         default-context: defaults
         prefixes:
           - config
-#logging:
-  #level:
-    #org.springframework.amqp.rabbit.connection.CachingConnectionFactory: WARN
+
+##During the process of creating the pulsar lazy producer in appender, there should no logs in the pulsar client code to append logs which would lead to deadlock
+##Disable logs for pulsar client as a temp solution
+logging:
+  level:
+    org.apache.pulsar.client.impl: OFF
 
