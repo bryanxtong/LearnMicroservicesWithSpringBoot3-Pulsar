@@ -7,10 +7,9 @@ import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.client.api.TypedMessageBuilder;
 
 import java.util.Map;
-
 /**
  * DeliveryStrategy that waits on the producer if the output buffer is full.
- *
+ * 
  * @since 0.0.1
  * @deprecated Use {@link AsynchronousDeliveryStrategy} instead.
  */
@@ -20,7 +19,6 @@ public class BlockingDeliveryStrategy extends ContextAwareBase implements Delive
     @Override
     public <K, V, E> boolean send(Producer<V> producer, ProducerRecord<K, V> record, E event, FailedDeliveryCallback<E> failureCallback) {
         try {
-
             TypedMessageBuilder<V> mb = producer.newMessage();
             K key = record.getKey();
             if (key instanceof byte[]) {

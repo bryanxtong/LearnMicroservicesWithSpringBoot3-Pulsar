@@ -2,6 +2,7 @@ package com.github.bryan.logback.pulsar;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
+import ch.qos.logback.core.Context;
 import ch.qos.logback.core.spi.AppenderAttachableImpl;
 import com.github.bryan.logback.pulsar.delivery.FailedDeliveryCallback;
 import org.apache.pulsar.client.api.*;
@@ -10,8 +11,6 @@ import org.apache.pulsar.client.impl.ProducerImpl;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 /**
  * @since 0.0.1
@@ -36,12 +35,6 @@ public class PulsarAppender<E> extends PulsarAppenderConfig<E> {
             aai.appendLoopOnAppenders(evt);
         }
     };
-
-    public PulsarAppender() {
-        // setting these as config values sidesteps an unnecessary warning (minor bug in KafkaProducer)
-        /*addProducerConfigValue(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class.getName());
-        addProducerConfigValue(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class.getName());*/
-    }
 
     @Override
     public void doAppend(E e) {
@@ -70,9 +63,7 @@ public class PulsarAppender<E> extends PulsarAppenderConfig<E> {
     @Override
     public void stop() {
         super.stop();
-
-        //pulsar client library will close the producer
-        /*if (lazyProducer != null && lazyProducer.isInitialized()) {
+        if (lazyProducer != null && lazyProducer.isInitialized()) {
             try {
                 Producer<byte[]> producer = lazyProducer.get();
                 if(null != producer && producer.isConnected()){
@@ -90,7 +81,7 @@ public class PulsarAppender<E> extends PulsarAppenderConfig<E> {
             } catch (PulsarClientException e) {
                 this.addWarn("Failed to shut down pulsar client: " + e.getMessage(), e);
             }
-        }*/
+        }
     }
 
     @Override
@@ -139,8 +130,9 @@ public class PulsarAppender<E> extends PulsarAppenderConfig<E> {
         if(e instanceof ILoggingEvent){
             this.getMessageProperties().put("level",((ILoggingEvent)e).getLevel().toString());
         }
-        Map<String, String> copyOfPropertyMap = encoder.getContext().getCopyOfPropertyMap();
-        if(copyOfPropertyMap != null){
+        Context context = encoder.getContext();
+        if(null != context){
+            Map<String, String> copyOfPropertyMap = context.getCopyOfPropertyMap();
             copyOfPropertyMap.entrySet().forEach(c-> this.getMessageProperties().put(c.getKey(), c.getValue()));
         }
         //add producer properties
@@ -168,11 +160,11 @@ public class PulsarAppender<E> extends PulsarAppenderConfig<E> {
     /**
      * If partition is not null , use that particular partition
      * During the appending process, there should be no other logs which appends for pulsar client code(pulsar client logging) which would lead to dead lock
-     * logging.level.org.apache.pulsar.client.impl=ERROR to avoid logging for pulsar clients
-     * @return
-     * @throws PulsarClientException
+     * logging.level.org.apache.pulsar.client.impl=OFF to avoid logging for pulsar clients
+     * @return Producer
+     * @throws PulsarClientException exception when creating the pulsar producer
      */
-    protected Producer<byte[]> createProducer() throws PulsarClientException, ExecutionException, InterruptedException, TimeoutException {
+    protected Producer<byte[]> createProducer() throws PulsarClientException {
         if(null == pulsarClient){
             pulsarClient = PulsarClient.builder()
                     .serviceUrl(brokerUrl)

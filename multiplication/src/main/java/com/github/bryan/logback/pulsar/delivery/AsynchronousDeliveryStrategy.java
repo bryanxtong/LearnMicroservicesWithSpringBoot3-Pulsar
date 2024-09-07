@@ -20,8 +20,8 @@ public class AsynchronousDeliveryStrategy implements DeliveryStrategy {
             TypedMessageBuilder<V> mb = producer.newMessage();
             K key = record.getKey();
             V value = record.getValue();
-
             Map<String, String> properties = record.getProperties();
+
             if (key instanceof byte[]) {
                 mb.key(new String((byte[]) key));
             } else if (key instanceof String) {
