@@ -136,6 +136,9 @@
                 </from>-->
                 <to>
                     <image>gateway</image>
+                    <tags>
+                        <tag>0.0.1-SNAPSHOT</tag>
+                    </tags>
                 </to>
                 <container>
                 <jvmFlags>

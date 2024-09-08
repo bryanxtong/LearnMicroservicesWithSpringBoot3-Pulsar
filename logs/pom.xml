@@ -84,7 +84,10 @@
 				<version>3.4.2</version>
 				<configuration>
 					<to>
-						<image>multiplication</image>
+						<image>logs</image>
+						<tags>
+							<tag>0.0.1-SNAPSHOT</tag>
+						</tags>
 					</to>
 					<container>
 						<jvmFlags>
