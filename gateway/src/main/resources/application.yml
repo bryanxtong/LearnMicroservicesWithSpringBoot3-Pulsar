@@ -71,3 +71,35 @@ management:
         #include: health, gateway
     #propagation:
       #type: w3c
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://challenges-frontend:3000"
+            allowedHeaders:
+              - "*"
+            allowedMethods:
+              - "GET"
+              - "POST"
+              - "OPTIONS"
+    consul:
+      host: ${SPRING_CLOUD_CONSUL_HOST:localhost}
+      port: 8500
+  pulsar:
+    admin:
+      service-url: http://${SPRING_CLOUD_PULSAR_HOST:localhost}:8080
+    client:
+      service-url: pulsar://${SPRING_CLOUD_PULSAR_HOST:localhost}:6650
+management:
+  zipkin:
+    tracing:
+      endpoint: http://${SPRING_CLOUD_ZIPKIN_HOST:localhost}:9411/api/v2/spans

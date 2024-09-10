@@ -26,8 +26,4 @@ public class PulsarConfiguration {
         return PulsarTopic.builder(topicName).numberOfPartitions(partitions).build();
     }
 
-    @Bean
-    public PulsarTopic partitionedLogsTopic(){
-        return PulsarTopic.builder("logs").numberOfPartitions(4).build();
-    }
 }

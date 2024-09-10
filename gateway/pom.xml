@@ -37,7 +37,7 @@
         <!--pulsar logback appender is using native pulsar client -->
         <dependency>
             <groupId>org.apache.pulsar</groupId>
-            <artifactId>pulsar-client</artifactId>
+            <artifactId>pulsar-client-all</artifactId>
             <version>3.1.0</version>
         </dependency>
 

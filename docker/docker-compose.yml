@@ -10,9 +10,15 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_PULSAR_HOST=pulsar
+      - SPRING_CLOUD_ZIPKIN_HOST=zipkin
     depends_on:
-      - pulsar
-      - consul-importer
+      pulsar:
+         condition: service_healthy
+      zipkin:
+         condition: service_healthy
+      consul-importer:
+         condition: service_completed_successfully
     networks:
       - microservices
   gamification:
@@ -20,9 +26,15 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_PULSAR_HOST=pulsar
+      - SPRING_CLOUD_ZIPKIN_HOST=zipkin
     depends_on:
-      - pulsar
-      - consul-importer
+      pulsar:
+         condition: service_healthy
+      zipkin:
+         condition: service_healthy
+      consul-importer:
+         condition: service_completed_successfully
     networks:
       - microservices
   gateway:
@@ -32,9 +44,15 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_PULSAR_HOST=pulsar
+      - SPRING_CLOUD_ZIPKIN_HOST=zipkin
     depends_on:
-      - pulsar
-      - consul-importer
+      pulsar:
+         condition: service_healthy
+      zipkin:
+         condition: service_healthy
+      consul-importer:
+         condition: service_completed_successfully
     networks:
       - microservices
   logs:
@@ -42,9 +60,15 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_PULSAR_HOST=pulsar
+      - SPRING_CLOUD_ZIPKIN_HOST=zipkin
     depends_on:
-      - pulsar
-      - consul-importer
+      pulsar:
+         condition: service_healthy
+      zipkin:
+         condition: service_healthy
+      consul-importer:
+         condition: service_completed_successfully
     networks:
       - microservices
   consul-importer:
@@ -69,6 +93,11 @@ services:
       - 6650:6650
       - 8080:8080
     command: 'bin/pulsar standalone'
+    healthcheck:
+      test: ["CMD","curl","-f","http://localhost:8080/admin/clusters"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
     networks:
       - microservices
   zipkin:
@@ -76,6 +105,12 @@ services:
     container_name: zipkin
     ports:
       - 9411:9411
+    healthcheck:
+      #test: [ "CMD","curl","-v","http://localhost:9411/health"]
+      test: wget --no-verbose --tries=1 --spider http://localhost:9411/health || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 3
     networks:
       - microservices
 networks:

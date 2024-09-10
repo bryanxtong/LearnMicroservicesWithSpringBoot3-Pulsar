@@ -7,8 +7,14 @@ import com.github.bryan.logback.pulsar.delivery.AsynchronousDeliveryStrategy;
 import com.github.bryan.logback.pulsar.delivery.DeliveryStrategy;
 import com.github.bryan.logback.pulsar.keying.KeyingStrategy;
 import com.github.bryan.logback.pulsar.keying.NoKeyKeyingStrategy;
+import org.apache.pulsar.client.admin.PulsarAdmin;
+import org.apache.pulsar.client.admin.PulsarAdminException;
+import org.apache.pulsar.client.admin.internal.PulsarAdminImpl;
+import org.apache.pulsar.client.api.PulsarClientException;
+import org.apache.pulsar.client.impl.conf.ClientConfigurationData;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,6 +25,7 @@ public abstract class PulsarAppenderConfig<E> extends UnsynchronizedAppenderBase
     protected String brokerUrl = null ;
     protected String topic = null;
 
+    protected String adminHttpUrl = null;
     protected Encoder<E> encoder = null;
     protected KeyingStrategy<? super E> keyingStrategy = null;
     protected DeliveryStrategy deliveryStrategy;
@@ -42,6 +49,27 @@ public abstract class PulsarAppenderConfig<E> extends UnsynchronizedAppenderBase
         if (topic == null) {
             addError("No topic set for the appender named [\"" + name + "\"].");
             errorFree = false;
+        }else{
+            //used in docker-compose to create the partitioned topic automatically in default namespace
+            if(adminHttpUrl!= null){
+                PulsarAdmin pulsarAdmin = null;
+                try {
+                    pulsarAdmin = new PulsarAdminImpl(adminHttpUrl, new ClientConfigurationData(),null);
+                    List<String> topicList = pulsarAdmin.topics().getPartitionedTopicList("public/default");
+                    if(null != topicList && !topicList.contains("persistent://public/default/"+ topic)){
+                        pulsarAdmin.topics().createPartitionedTopic("persistent://public/default/"+ topic, 4);
+                    }
+                } catch (PulsarClientException e) {
+                    throw new RuntimeException(e);
+                } catch (PulsarAdminException e) {
+                    throw new RuntimeException(e);
+                }finally {
+                    if(null != pulsarAdmin){
+                        pulsarAdmin.close();
+                    }
+                }
+            }
+            //used in docker-compose to create the topic automatically
         }
 
         if (encoder == null) {
@@ -83,6 +111,10 @@ public abstract class PulsarAppenderConfig<E> extends UnsynchronizedAppenderBase
         if(split.length == 2){
             addMessagePropertyValue(split[0], split[1]);
         }
+    }
+
+    public void setAdminHttpUrl(String adminHttpUrl) {
+        this.adminHttpUrl = adminHttpUrl;
     }
 
     public void addMessagePropertyValue(String key, String value) {

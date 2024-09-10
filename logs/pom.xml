@@ -51,6 +51,22 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-observation</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-tracing</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-tracing-bridge-brave</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.zipkin.reporter2</groupId>
+			<artifactId>zipkin-reporter-brave</artifactId>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
@@ -94,7 +110,7 @@
 							<jvmFlag>-Xms512m</jvmFlag>
 							<jvmFlag>-Xdebug</jvmFlag>
 						</jvmFlags>
-						<mainClass>icroservices.book.logs.LogsApplication</mainClass>
+						<mainClass>microservices.book.logs.LogsApplication</mainClass>
 					</container>
 				</configuration>
 			</plugin>
