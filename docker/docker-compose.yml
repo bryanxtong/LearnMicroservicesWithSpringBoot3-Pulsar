@@ -1,4 +1,4 @@
-version: "3"
+version: "3.9"
 
 services:
   frontend:
@@ -98,6 +98,9 @@ services:
       interval: 10s
       timeout: 10s
       retries: 3
+    depends_on:
+      zipkin:
+         condition: service_healthy
     networks:
       - microservices
   zipkin:
