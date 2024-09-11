@@ -70,8 +70,8 @@ challenges-frontend$ npm install
 challenges-frontend$ npm run build
 challenges-frontend$ docker build -t challenges-frontend:1.0 .
 ```
-add items to hosts
-C:\Windows\System32\drivers\etc\hosts
+It is only necessary for docker deployment of frontend app
+add items to hosts C:\Windows\System32\drivers\etc\hosts
     127.0.0.1	    challenges-frontend
 
 Once you have all the images ready, run:

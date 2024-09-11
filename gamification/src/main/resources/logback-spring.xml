@@ -22,8 +22,8 @@
                 <partition>0</partition>
         -->
         <!-- brokerUrl is the only mandatory -->
-        <brokerUrl>pulsar://${SPRING_CLOUD_PULSAR_HOST}:6650</brokerUrl>
-        <adminHttpUrl>http://${SPRING_CLOUD_PULSAR_HOST}:8080</adminHttpUrl>
+        <brokerUrl>pulsar://${SPRING_CLOUD_PULSAR_HOST:-localhost}:6650</brokerUrl>
+        <adminHttpUrl>http://${SPRING_CLOUD_PULSAR_HOST:-localhost}:8080</adminHttpUrl>
         <!-- this is the fallback appender if pulsar is not available. -->
         <appender-ref ref="CONSOLE" />
     </appender>

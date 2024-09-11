@@ -55,9 +55,11 @@ public abstract class PulsarAppenderConfig<E> extends UnsynchronizedAppenderBase
                 PulsarAdmin pulsarAdmin = null;
                 try {
                     pulsarAdmin = new PulsarAdminImpl(adminHttpUrl, new ClientConfigurationData(),null);
-                    List<String> topicList = pulsarAdmin.topics().getPartitionedTopicList("public/default");
-                    if(null != topicList && !topicList.contains("persistent://public/default/"+ topic)){
-                        pulsarAdmin.topics().createPartitionedTopic("persistent://public/default/"+ topic, 4);
+                    synchronized (this){
+                        List<String> topicList = pulsarAdmin.topics().getPartitionedTopicList("public/default");
+                        if(null != topicList && !topicList.contains("persistent://public/default/"+ topic)){
+                            pulsarAdmin.topics().createPartitionedTopic("persistent://public/default/"+ topic, 4);
+                        }
                     }
                 } catch (PulsarClientException e) {
                     throw new RuntimeException(e);

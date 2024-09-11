@@ -10,6 +10,8 @@ spring:
         # Not needed since we excluded the dependency
         enabled: false
     consul:
+      host: ${SPRING_CLOUD_CONSUL_HOST:localhost}
+      port: 8500
       enabled: true
       discovery:
         # Get only services that are passing the health check
@@ -41,10 +43,11 @@ spring:
             methods: GET,POST
       observability:
         enabled: true
-      #httpserver:
-        #wiretap: true
-      #httpclient:
-        #wiretap: true
+    pulsar:
+      admin:
+        service-url: http://${SPRING_CLOUD_PULSAR_HOST:localhost}:8080
+      client:
+        service-url: pulsar://${SPRING_CLOUD_PULSAR_HOST:localhost}:6650
   reactor:
     context-propagation: auto
 ##working with default logback configuration for distributed tracing
@@ -73,7 +76,8 @@ management:
       #type: w3c
   zipkin:
     tracing:
-      endpoint: http://localhost:9411/api/v2/spans
+      endpoint: http://${SPRING_CLOUD_ZIPKIN_HOST:localhost}:9411/api/v2/spans
+
 ---
 spring:
   config:
@@ -91,15 +95,3 @@ spring:
               - "GET"
               - "POST"
               - "OPTIONS"
-    consul:
-      host: ${SPRING_CLOUD_CONSUL_HOST:localhost}
-      port: 8500
-  pulsar:
-    admin:
-      service-url: http://${SPRING_CLOUD_PULSAR_HOST:localhost}:8080
-    client:
-      service-url: pulsar://${SPRING_CLOUD_PULSAR_HOST:localhost}:6650
-management:
-  zipkin:
-    tracing:
-      endpoint: http://${SPRING_CLOUD_ZIPKIN_HOST:localhost}:9411/api/v2/spans
